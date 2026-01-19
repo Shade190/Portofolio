@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Portfolio of Kevin Mahardika Kumaeni - Web Developer & Designer"
+    />
+    <meta name="theme-color" content="#5C6AC4" />
+    <title>
+      Kevin Mahardika Kumaeni - Web Developer & Designer | Portfolio
+    </title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+  </head>
+  <body>
+    <!-- Theme Toggle Button -->
+    <button class="theme-toggle" title="Toggle Dark Mode">
+      <i class="fas fa-moon"></i>
+    </button>
+
+    <!-- Image Popup Modal -->
+    <div class="image-modal" id="imageModal">
+      <span class="modal-close">&times;</span>
+      <img class="modal-content" id="modalImage" src="" alt="Enlarged view" />
+    </div>
+    <!-- Header Section -->
+    <header>
+      <nav class="container">
+        <div class="logo">Kepun</div>
+        <ul class="nav-links">
+          <li><a href="#home" class="nav-link">Home</a></li>
+          <li><a href="#about" class="nav-link">About</a></li>
+          <li><a href="#projects" class="nav-link">Projects</a></li>
+          <li><a href="#contact" class="nav-link">Contact</a></li>
+        </ul>
+        <div class="hamburger">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+      <div class="hero-content">
+        <h1>Hi, I'm <span class="highlight">Kevin Mahardika Kumaeni</span></h1>
+        <p class="hero-subtitle">
+          Web Developer & Designer | Creating Digital Experiences
+        </p>
+        <div class="hero-buttons">
+          <button
+            class="btn btn-primary"
+            onclick="
+              document
+                .querySelector('#projects')
+                .scrollIntoView({ behavior: 'smooth' })
+            "
+          >
+            View My Work
+          </button>
+          <button
+            class="btn btn-secondary"
+            onclick="
+              document
+                .querySelector('#contact')
+                .scrollIntoView({ behavior: 'smooth' })
+            "
+          >
+            Get In Touch
+          </button>
+        </div>
+        <div class="scroll-indicator">
+          <span></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+      <div class="container">
+        <h2>About Me</h2>
+        <div class="about-content">
+          <div class="about-text">
+            <p>
+              Hello! I'm Kevin Mahardika Kumaeni, a passionate web developer
+              with experience in creating dynamic and responsive websites. I
+              love turning ideas into reality using code.
+            </p>
+            <div class="skills">
+              <h3>Skills & Expertise</h3>
+              <div class="skills-grid">
+                <div class="skill-item">
+                  <div class="skill-icon">
+                    <i class="fab fa-html5"></i>
+                  </div>
+                  <div class="skill-content">
+                    <h4>HTML/CSS</h4>
+                    <div class="skill-bar">
+                      <div class="progress">
+                        <div class="progress-fill" style="width: 90%"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="skill-item">
+                  <div class="skill-icon">
+                    <i class="fab fa-js"></i>
+                  </div>
+                  <div class="skill-content">
+                    <h4>JavaScript</h4>
+                    <div class="skill-bar">
+                      <div class="progress">
+                        <div class="progress-fill" style="width: 80%"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="skill-item">
+                  <div class="skill-icon">
+                    <i class="fab fa-php"></i>
+                  </div>
+                  <div class="skill-content">
+                    <h4>PHP</h4>
+                    <div class="skill-bar">
+                      <div class="progress">
+                        <div class="progress-fill" style="width: 70%"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="about-image">
+            <img src="Screenshot 2025-10-16 113835.png" alt="Profile Image" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="projects">
+      <div class="container">
+        <h2>Featured Projects</h2>
+        <div class="project-filters">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="web">Web</button>
+          <button class="filter-btn" data-filter="game">Game</button>
+          <button class="filter-btn" data-filter="design">Design</button>
+        </div>
+        <div class="projects-grid">
+          <div class="project-card" data-category="web">
+            <div class="project-image">
+              <img
+                src="E commerce.png"
+                alt="Project 1"
+                class="clickable-image"
+              />
+              <div class="clickable-image-icon">
+                <i class="fas fa-expand"></i>
+              </div>
+              <div class="project-overlay">
+                <a href="#" class="project-link">
+                  <i class="fas fa-external-link-alt"></i>
+                </a>
+              </div>
+            </div>
+            <div class="project-info">
+              <span class="project-category">Web Development</span>
+              <h3>E-commerce Website</h3>
+              <p>
+                Platform e-commerce modern untuk pembelian dan pemesanan makanan
+                dengan UI yang intuitif.
+              </p>
+              <a href="E commerce.png" class="btn-small">View Project</a>
+            </div>
+          </div>
+          <div class="project-card" data-category="game">
+            <div class="project-image">
+              <img
+                src="Screenshot 2025-11-28 081028.png"
+                alt="Project 2"
+                class="clickable-image"
+              />
+              <div class="clickable-image-icon">
+                <i class="fas fa-expand"></i>
+              </div>
+              <div class="project-overlay">
+                <a href="#" class="project-link">
+                  <i class="fas fa-external-link-alt"></i>
+                </a>
+              </div>
+            </div>
+            <div class="project-info">
+              <span class="project-category">Game Development</span>
+              <h3>Python Game</h3>
+              <p>
+                Game interaktif yang dibuat menggunakan Python dengan mekanik
+                gameplay yang menarik.
+              </p>
+              <a href="Screenshot 2025-11-28 081028.png" class="btn-small"
+                >View Project</a
+              >
+            </div>
+          </div>
+          <div class="project-card" data-category="design">
+            <div class="project-image">
+              <img
+                src="Screenshot 2025-11-28 081743.png"
+                alt="Project 3"
+                class="clickable-image"
+              />
+              <div class="clickable-image-icon">
+                <i class="fas fa-expand"></i>
+              </div>
+              <div class="project-overlay">
+                <a href="#" class="project-link">
+                  <i class="fas fa-external-link-alt"></i>
+                </a>
+              </div>
+            </div>
+            <div class="project-info">
+              <span class="project-category">UI/UX Design</span>
+              <h3>Design System</h3>
+              <p>
+                Comprehensive design system dan prototypes yang dibuat
+                menggunakan Figma.
+              </p>
+              <a href="Screenshot 2025-11-28 081743.png" class="btn-small"
+                >View Project</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+      <div class="container">
+        <h2>Contact Me</h2>
+        <div class="contact-content">
+          <div class="contact-info">
+            <h3>Get in Touch</h3>
+            <p>
+              Feel free to reach out if you have any questions or opportunities!
+            </p>
+            <div class="contact-details">
+              <div class="contact-item">
+                <i class="fas fa-envelope"></i>
+                <span>pun@gmail.com</span>
+              </div>
+              <div class="contact-item">
+                <i class="fas fa-phone"></i>
+                <span>+62 (123) 456-7890</span>
+              </div>
+              <div class="contact-item">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>Indonesia</span>
+              </div>
+            </div>
+            <div class="social-links">
+              <a href="#"><i class="fab fa-github"></i></a>
+              <a href="#"><i class="fab fa-linkedin"></i></a>
+              <a href="#"><i class="fab fa-twitter"></i></a>
+              <a href="#"><i class="fab fa-instagram"></i></a>
+            </div>
+          </div>
+          <form class="contact-form">
+            <input type="text" placeholder="Your Name" required />
+            <input type="email" placeholder="Your Email" required />
+            <textarea placeholder="Your Message" required></textarea>
+            <button type="submit" class="btn">Send Message</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-section">
+            <h4>Kevin Mahardika Kumaeni</h4>
+            <p>
+              Web Developer & Designer passionate about creating beautiful
+              digital experiences.
+            </p>
+          </div>
+          <div class="footer-section">
+            <h4>Quick Links</h4>
+            <ul>
+              <li><a href="#home">Home</a></li>
+              <li><a href="#about">About</a></li>
+              <li><a href="#projects">Projects</a></li>
+              <li><a href="#contact">Contact</a></li>
+            </ul>
+          </div>
+          <div class="footer-section">
+            <h4>Follow Me</h4>
+            <div class="footer-social">
+              <a href="#"><i class="fab fa-github"></i></a>
+              <a href="#"><i class="fab fa-linkedin"></i></a>
+              <a href="#"><i class="fab fa-twitter"></i></a>
+              <a href="#"><i class="fab fa-instagram"></i></a>
+            </div>
+          </div>
+        </div>
+        <hr />
+        <div class="footer-bottom">
+          <p>&copy; 2025 Kevin Mahardika Kumaeni. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
