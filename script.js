@@ -398,7 +398,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const particleWrap = document.createElement("div");
     particleWrap.className = "particles";
     hero.appendChild(particleWrap);
-    const count = window.innerWidth < 768 ? 6 : 10;
+    const count = window.innerWidth < 768 ? 4 : 5;
     for (let i = 0; i < count; i++) {
       const p = document.createElement("span");
       p.className = "particle";
@@ -415,13 +415,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ---------- Subtle parallax on hero orbs (mouse, desktop only) ---------- */
   if (!prefersReducedMotion && hero && canHover) {
+    let ticking = false;
     hero.addEventListener("mousemove", (e) => {
-      const { innerWidth: w, innerHeight: h } = window;
-      const relX = (e.clientX / w - 0.5) * 2;
-      const relY = (e.clientY / h - 0.5) * 2;
-      document.querySelectorAll(".orb").forEach((orb, i) => {
-        const strength = (i + 1) * 4;
-        orb.style.transform = `translate(${relX * strength}px, ${relY * strength}px)`;
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const { innerWidth: w, innerHeight: h } = window;
+        const relX = (e.clientX / w - 0.5) * 2;
+        const relY = (e.clientY / h - 0.5) * 2;
+        document.querySelectorAll(".orb").forEach((orb, i) => {
+          const strength = (i + 1) * 4;
+          orb.style.transform = `translate(${relX * strength}px, ${relY * strength}px)`;
+        });
+        ticking = false;
       });
     });
   }
@@ -437,7 +443,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let clusters = [];
     let nebulaBlobs = [];
     let auroraBands = [];
-    let w = 0, h = 0, dpr = Math.min(window.devicePixelRatio || 1, 2);
+    let w = 0, h = 0, dpr = Math.min(window.devicePixelRatio || 1, 1.5);
 
     function rand(min, max) { return Math.random() * (max - min) + min; }
 
@@ -467,7 +473,7 @@ document.addEventListener("DOMContentLoaded", () => {
       ];
 
       /* Scattered background stars */
-      const starCount = Math.round((w * h) / 8500);
+      const starCount = Math.round((w * h) / 14000);
       stars = [];
       for (let i = 0; i < starCount; i++) {
         stars.push({
@@ -531,7 +537,7 @@ document.addEventListener("DOMContentLoaded", () => {
       ctx.globalCompositeOperation = "screen";
       const tt = prefersReducedMotion ? 0 : t;
       for (const band of auroraBands) {
-        const steps = 40;
+        const steps = 28;
         const topPts = [];
         const botPts = [];
         for (let i = 0; i <= steps; i++) {
@@ -585,26 +591,50 @@ document.addEventListener("DOMContentLoaded", () => {
           ctx.beginPath();
           ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
           ctx.fillStyle = `rgba(255,255,255,${(0.85 * twinkle).toFixed(3)})`;
-          ctx.shadowColor = "rgba(165,180,252,0.9)";
-          ctx.shadowBlur = 6;
           ctx.fill();
-          ctx.shadowBlur = 0;
         }
       }
     }
 
+    let animating = true;
+    let rafId = null;
+
     function draw(t) {
+      if (!animating) return;
       ctx.clearRect(0, 0, w, h);
       drawNebula(t);
       drawAurora(t);
       drawStars(t);
       drawConstellations(t);
-      if (!prefersReducedMotion) requestAnimationFrame(draw);
+      if (!prefersReducedMotion) rafId = requestAnimationFrame(draw);
+    }
+
+    function startAnimation() {
+      if (animating) return;
+      animating = true;
+      rafId = requestAnimationFrame(draw);
+    }
+
+    function stopAnimation() {
+      animating = false;
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = null;
     }
 
     buildField();
-    requestAnimationFrame(draw);
+    rafId = requestAnimationFrame(draw);
     if (prefersReducedMotion) draw(0);
+
+    const heroObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) startAnimation();
+          else stopAnimation();
+        });
+      },
+      { threshold: 0.05 }
+    );
+    heroObserver.observe(heroEl);
 
     let resizeTimer;
     window.addEventListener("resize", () => {
