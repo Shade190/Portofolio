@@ -426,6 +426,193 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  /* ---------- Nebula + aurora + starfield canvas (hero background) ---------- */
+  (function initHeroScene() {
+    const canvas = document.getElementById("starCanvas");
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    const heroEl = document.querySelector(".hero");
+    const supportsCtxFilter = "filter" in ctx;
+    let stars = [];
+    let clusters = [];
+    let nebulaBlobs = [];
+    let auroraBands = [];
+    let w = 0, h = 0, dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    function rand(min, max) { return Math.random() * (max - min) + min; }
+
+    function buildField() {
+      w = heroEl.offsetWidth;
+      h = heroEl.offsetHeight;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      canvas.style.width = w + "px";
+      canvas.style.height = h + "px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      /* Nebula — large soft drifting color blobs, blurred like clouds of gas */
+      nebulaBlobs = [
+        { cx: 0.18, cy: 0.28, r: 0.42, color: "99,102,241", alpha: 0.55, sx: 0.05, sy: 0.04, speed: 0.00018, phase: 0 },
+        { cx: 0.82, cy: 0.18, r: 0.34, color: "56,189,248", alpha: 0.4, sx: 0.04, sy: 0.05, speed: 0.00022, phase: 2 },
+        { cx: 0.55, cy: 0.55, r: 0.4, color: "129,140,248", alpha: 0.32, sx: 0.06, sy: 0.03, speed: 0.00015, phase: 4 },
+        { cx: 0.88, cy: 0.75, r: 0.3, color: "236,72,153", alpha: 0.22, sx: 0.03, sy: 0.05, speed: 0.0002, phase: 1 },
+        { cx: 0.22, cy: 0.85, r: 0.32, color: "217,119,6", alpha: 0.14, sx: 0.04, sy: 0.03, speed: 0.00019, phase: 3 },
+      ];
+
+      /* Aurora — flowing wavy ribbons sweeping across the hero */
+      auroraBands = [
+        { baseY: 0.22, amp: 0.07, freq: 1.6, speed: 0.00028, phase: 0.4, thickness: 0.16, colorTop: "129,140,248", colorMid: "103,232,249", alpha: 0.32 },
+        { baseY: 0.42, amp: 0.09, freq: 1.2, speed: 0.00021, phase: 2.1, thickness: 0.2, colorTop: "165,180,252", colorMid: "236,72,153", alpha: 0.22 },
+        { baseY: 0.66, amp: 0.06, freq: 1.9, speed: 0.00025, phase: 4.0, thickness: 0.14, colorTop: "56,189,248", colorMid: "129,140,248", alpha: 0.2 },
+      ];
+
+      /* Scattered background stars */
+      const starCount = Math.round((w * h) / 8500);
+      stars = [];
+      for (let i = 0; i < starCount; i++) {
+        stars.push({
+          x: rand(0, w),
+          y: rand(0, h),
+          r: rand(0.5, 1.6),
+          baseAlpha: rand(0.25, 0.85),
+          twinkleSpeed: rand(0.0006, 0.0022),
+          phase: rand(0, Math.PI * 2),
+        });
+      }
+
+      /* Constellation clusters: small groups of brighter stars linked by faint lines,
+         tucked into corners so they don't clutter the hero text */
+      const zones = [
+        { cx: w * 0.1, cy: h * 0.18, spread: Math.min(w, h) * 0.16 },
+        { cx: w * 0.9, cy: h * 0.14, spread: Math.min(w, h) * 0.14 },
+        { cx: w * 0.06, cy: h * 0.78, spread: Math.min(w, h) * 0.15 },
+        { cx: w * 0.94, cy: h * 0.82, spread: Math.min(w, h) * 0.15 },
+      ];
+      clusters = zones.map((z) => {
+        const n = Math.round(rand(4, 6));
+        const pts = [];
+        for (let i = 0; i < n; i++) {
+          pts.push({
+            x: z.cx + rand(-z.spread, z.spread),
+            y: z.cy + rand(-z.spread, z.spread),
+            r: rand(1.3, 2.2),
+            phase: rand(0, Math.PI * 2),
+          });
+        }
+        const links = [];
+        for (let i = 0; i < pts.length - 1; i++) links.push([i, i + 1]);
+        return { pts, links };
+      });
+    }
+
+    function drawNebula(t) {
+      ctx.save();
+      if (supportsCtxFilter) ctx.filter = `blur(${Math.max(w, h) * 0.09}px)`;
+      ctx.globalCompositeOperation = "screen";
+      for (const b of nebulaBlobs) {
+        const tt = prefersReducedMotion ? 0 : t;
+        const cx = (b.cx + Math.sin(tt * b.speed + b.phase) * b.sx) * w;
+        const cy = (b.cy + Math.cos(tt * b.speed * 1.3 + b.phase) * b.sy) * h;
+        const r = b.r * Math.max(w, h);
+        const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+        grad.addColorStop(0, `rgba(${b.color},${b.alpha})`);
+        grad.addColorStop(1, `rgba(${b.color},0)`);
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    function drawAurora(t) {
+      ctx.save();
+      if (supportsCtxFilter) ctx.filter = `blur(${Math.max(18, h * 0.025)}px)`;
+      ctx.globalCompositeOperation = "screen";
+      const tt = prefersReducedMotion ? 0 : t;
+      for (const band of auroraBands) {
+        const steps = 40;
+        const topPts = [];
+        const botPts = [];
+        for (let i = 0; i <= steps; i++) {
+          const xf = i / steps;
+          const x = xf * w;
+          const edgeFade = Math.sin(Math.PI * xf); /* fades out at left/right edges */
+          const wave = Math.sin(xf * band.freq * Math.PI * 2 + band.phase + tt * band.speed) * band.amp * h;
+          const yTop = band.baseY * h + wave - band.thickness * h * 0.5 * edgeFade;
+          const yBot = band.baseY * h + wave + band.thickness * h * 0.5 * edgeFade;
+          topPts.push([x, yTop]);
+          botPts.push([x, yBot]);
+        }
+        ctx.beginPath();
+        ctx.moveTo(topPts[0][0], topPts[0][1]);
+        for (const p of topPts) ctx.lineTo(p[0], p[1]);
+        for (let i = botPts.length - 1; i >= 0; i--) ctx.lineTo(botPts[i][0], botPts[i][1]);
+        ctx.closePath();
+        const grad = ctx.createLinearGradient(0, band.baseY * h - band.thickness * h, 0, band.baseY * h + band.thickness * h);
+        grad.addColorStop(0, `rgba(${band.colorTop},0)`);
+        grad.addColorStop(0.5, `rgba(${band.colorMid},${band.alpha})`);
+        grad.addColorStop(1, `rgba(${band.colorTop},0)`);
+        ctx.fillStyle = grad;
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    function drawStars(t) {
+      for (const s of stars) {
+        const twinkle = prefersReducedMotion ? 1 : 0.55 + 0.45 * Math.sin(t * s.twinkleSpeed + s.phase);
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,255,255,${(s.baseAlpha * twinkle).toFixed(3)})`;
+        ctx.fill();
+      }
+    }
+
+    function drawConstellations(t) {
+      for (const c of clusters) {
+        ctx.strokeStyle = "rgba(165,180,252,0.28)";
+        ctx.lineWidth = 1;
+        for (const [a, b] of c.links) {
+          const p1 = c.pts[a], p2 = c.pts[b];
+          ctx.beginPath();
+          ctx.moveTo(p1.x, p1.y);
+          ctx.lineTo(p2.x, p2.y);
+          ctx.stroke();
+        }
+        for (const p of c.pts) {
+          const twinkle = prefersReducedMotion ? 1 : 0.6 + 0.4 * Math.sin(t * 0.0015 + p.phase);
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255,255,255,${(0.85 * twinkle).toFixed(3)})`;
+          ctx.shadowColor = "rgba(165,180,252,0.9)";
+          ctx.shadowBlur = 6;
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        }
+      }
+    }
+
+    function draw(t) {
+      ctx.clearRect(0, 0, w, h);
+      drawNebula(t);
+      drawAurora(t);
+      drawStars(t);
+      drawConstellations(t);
+      if (!prefersReducedMotion) requestAnimationFrame(draw);
+    }
+
+    buildField();
+    requestAnimationFrame(draw);
+    if (prefersReducedMotion) draw(0);
+
+    let resizeTimer;
+    window.addEventListener("resize", () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(buildField, 200);
+    });
+  })();
+
   /* ---------- Marquee ticker content ---------- */
   const tickerTrack = document.getElementById("tickerTrack");
   if (tickerTrack) {
