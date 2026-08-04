@@ -668,6 +668,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const wrap = document.createElement("div");
     wrap.className = "scrollspy";
     spySections.forEach((s) => {
+   
       const dot = document.createElement("div");
       dot.className = "scrollspy-dot";
       dot.dataset.target = s.id;
