@@ -326,21 +326,50 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.key === "Escape") closeModal();
   });
 
-  /* ---------- Contact form (demo, no backend) — quiet success state ---------- */
+  /* ---------- Contact form submission to Formspree ---------- */
   const form = document.getElementById("contactForm");
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const btn = form.querySelector(".btn-primary");
-    const original = btn.innerHTML;
-    btn.innerHTML = '<svg class="check-draw" viewBox="0 0 24 24" width="18" height="18"><path d="M4 12.5l5 5L20 6" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Message Sent!';
-    btn.classList.add("success");
-    form.reset();
-    form.querySelectorAll(".form-group").forEach((g) => g.classList.remove("filled", "focused"));
-    setTimeout(() => {
-      btn.innerHTML = original;
-      btn.classList.remove("success");
-    }, 2400);
-  });
+  if (form) {
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const btn = form.querySelector("button[type='submit']");
+      const original = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<svg class="check-draw" viewBox="0 0 24 24" width="18" height="18"><path d="M4 12.5l5 5L20 6" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Sending...';
+
+      try {
+        const response = await fetch(form.action, {
+          method: form.method,
+          body: new FormData(form),
+          headers: {
+            Accept: "application/json"
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error("Request failed");
+        }
+
+        btn.innerHTML = '<svg class="check-draw" viewBox="0 0 24 24" width="18" height="18"><path d="M4 12.5l5 5L20 6" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Message Sent!';
+        btn.classList.add("success");
+        form.reset();
+        form.querySelectorAll(".form-group").forEach((g) => g.classList.remove("filled", "focused"));
+
+        setTimeout(() => {
+          btn.innerHTML = original;
+          btn.classList.remove("success");
+          btn.disabled = false;
+        }, 2400);
+      } catch (error) {
+        btn.innerHTML = 'Failed to send';
+        btn.classList.remove("success");
+        setTimeout(() => {
+          btn.innerHTML = original;
+          btn.disabled = false;
+        }, 2400);
+      }
+    });
+  }
 
   /* ---------- Floating labels (contact form) ---------- */
   document.querySelectorAll(".form-group").forEach((group) => {
